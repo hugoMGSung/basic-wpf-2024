@@ -22,7 +22,7 @@
             <StackPanel>
                 <Label Content="라벨" />
                 <TextBlock Text="텍스트블록" Margin="5" />
-                <TextBox Text="텍스트박스" />
+                <TextBox x:Name="TxtPosition" Text="텍스트박스" />
                 <ProgressBar x:Name="PgbTemp" Value="40" Height="20" />
                 <Slider x:Name="SldTemp" Value="40" Minimum="0" Maximum="100" ValueChanged="SldTemp_ValueChanged" /> 
                 <PasswordBox x:Name="PsbTemp" Password="12345" />
@@ -32,7 +32,7 @@
                     <RadioButton x:Name="RdoMale" Content="남자" />
                     <RadioButton x:Name="RdoFemale" Content="여자" />                    
                 </StackPanel>
-                <ToggleButton Content="토글버튼" />
+                <ToggleButton x:Name="BtnToggle" Content="토글버튼" />
 
             </StackPanel>
         </GroupBox>
@@ -40,7 +40,8 @@
         <GroupBox Grid.Row="1" Grid.Column="0" Margin="10" Header="이미지, 동영상">
             <StackPanel>
                 <Image Source="/sample.png" Height="50" />
-                <MediaElement x:Name="MdeMovie" LoadedBehavior="Play" Source="/resource/sample.wmv" />
+                <MediaElement x:Name="MdeMovie" LoadedBehavior="Manual" Source="/resource/sample.wmv" MediaOpened="MdeMovie_MediaOpened" ScrubbingEnabled="True" Height="100"/>
+                <Slider x:Name="sbarPosition" Width="207"/>
             </StackPanel>
         </GroupBox>
 
@@ -58,10 +59,10 @@
 
         <GroupBox Grid.Row="1" Grid.Column="1" Margin="10" Header="복합컨트롤">
             <StackPanel>
-                <Button>
+                <Button x:Name="BtnPlay" Click="BtnPlay_Click">
                     <Image Source="sample.png" Height="30" />                    
                 </Button>
-                <Button>
+                <Button x:Name="BtnStop">
                     <CheckBox>
                         <TextBlock Text="확인요" />
                     </CheckBox>
