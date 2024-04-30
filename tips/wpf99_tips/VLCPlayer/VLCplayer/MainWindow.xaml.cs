@@ -14,7 +14,7 @@ namespace VLCplayer
 
         void VlcControl_Loaded(object sender, RoutedEventArgs e)
         {
-            VlcControl_LoadVideo("D:\\Temp\\minions.mp4");
+            VlcControl_LoadVideo(@"C:\Temp\minions.mp4");
         }
 
         void VlcControl_LoadVideo(string videoPath)
