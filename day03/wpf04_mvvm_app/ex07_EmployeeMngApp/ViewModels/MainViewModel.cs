@@ -18,12 +18,97 @@ namespace ex07_EmployeeMngApp.ViewModels
         // MVVM처럼 List를 사용못함.
         private BindableCollection<Employees> listEmployees;
 
-        // 속성
-        public int Id { get => id; set => id = value; }
-        public string EmpName { get => empName; set => empName = value; }
-        public decimal Salary { get => salary; set => salary = value; }
-        public string DeptName { get => deptName; set => deptName = value; }
-        public string Addr { get => addr; set => addr = value; }       
+        private Employees selectedEmployee;
+
+        public Employees SelectedEmployee
+        {
+            get => selectedEmployee;
+            set
+            {
+                selectedEmployee = value;
+                // 데이터를 TextBox들에 전달.
+
+                if (selectedEmployee != null)
+                {
+                    Id = value.Id;
+                    EmpName = value.EmpName;
+                    Salary = value.Salary;
+                    DeptName = value.DeptName;
+                    Addr = value.Addr;
+
+                    NotifyOfPropertyChange(() => SelectedEmployee); // View에 데이터가 표시될려면 필수!!!
+                    NotifyOfPropertyChange(() => Id);
+                    NotifyOfPropertyChange(() => EmpName);
+                    NotifyOfPropertyChange(() => Salary);
+                    NotifyOfPropertyChange(() => DeptName);
+                    NotifyOfPropertyChange(() => Addr);
+                }
+            }
+        }
+
+        // 속성 
+        public int Id
+        {
+            get => id; 
+            set
+            {
+                id = value;
+                NotifyOfPropertyChange(() => Id);
+                NotifyOfPropertyChange(() => CanDelEmployee); // 삭제여부 속성도 변경했다 공지
+            }
+        }
+        public string EmpName
+        {
+            get => empName; 
+            set
+            {
+                empName = value;
+                NotifyOfPropertyChange(() => EmpName);
+                NotifyOfPropertyChange(() => CanSaveEmployee);
+            }
+        }
+        public decimal Salary
+        {
+            get => salary;
+            set
+            {
+                salary = value;
+                NotifyOfPropertyChange(() => Salary);
+                NotifyOfPropertyChange(() => CanSaveEmployee);
+            }
+        }
+        public string DeptName
+        {
+            get => deptName;
+            set
+            {
+                deptName = value;
+                NotifyOfPropertyChange(() => DeptName);
+                NotifyOfPropertyChange(() => CanSaveEmployee);
+            }
+        }
+
+        // 저장버튼 활성화 여부 속성
+        public bool CanSaveEmployee
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(EmpName) || Salary == 0 || string.IsNullOrEmpty(DeptName))
+                    return false;
+                else
+                    return true;
+            }
+        }
+
+        public string Addr
+        {
+            get => addr;
+            set
+            {
+                addr = value;
+                NotifyOfPropertyChange(() => Addr);
+            }
+        }
 
         // DataGrid에 뿌릴 Employees 테이블 데이터
         public BindableCollection<Employees> ListEmployees
@@ -40,8 +125,10 @@ namespace ex07_EmployeeMngApp.ViewModels
         public MainViewModel()
         {
             DisplayName = "직원관리 시스템";
-        }
 
+            // 조회 실행
+            GetEmployees();
+        }
 
 
         /// <summary>
@@ -55,7 +142,10 @@ namespace ex07_EmployeeMngApp.ViewModels
                 conn.Open();
                 SqlCommand cmd = new SqlCommand();
                 cmd.Connection = conn;
-                cmd.CommandText = Models.Employees.INSERT_QUERY;
+                if (Id == 0) // INSERT
+                    cmd.CommandText = Models.Employees.INSERT_QUERY;
+                else // UPDATE
+                    cmd.CommandText = Models.Employees.UPDATE_QUERY;
 
                 SqlParameter prmEmpName = new SqlParameter("@EmpName", EmpName);
                 cmd.Parameters.Add(prmEmpName);
@@ -63,8 +153,14 @@ namespace ex07_EmployeeMngApp.ViewModels
                 cmd.Parameters.Add(prmSalary);
                 SqlParameter prmDeptName = new SqlParameter("@DeptName", DeptName);
                 cmd.Parameters.Add(prmDeptName);
-                SqlParameter prmAddr = new SqlParameter("@Addr", Addr);
+                SqlParameter prmAddr = new SqlParameter("@Addr", Addr ?? (object)DBNull.Value); // 주소가 빈값일때 컬럼에 null값을 입력
                 cmd.Parameters.Add(prmAddr);
+
+                if (Id != 0) // 업데이트면 Id 파라미터가 필요
+                {
+                    SqlParameter prmId = new SqlParameter("@Id", Id);
+                    cmd.Parameters.Add(prmId);
+                }
 
                 var result = cmd.ExecuteNonQuery();
 
@@ -75,6 +171,8 @@ namespace ex07_EmployeeMngApp.ViewModels
                 {
                     MessageBox.Show("저장실패!");
                 }
+                GetEmployees(); // 그리드 재조회
+                NewEmployee(); // 모든 입력컨트롤 초기화 
             }
         }
 
@@ -99,6 +197,54 @@ namespace ex07_EmployeeMngApp.ViewModels
                     });
                 }
             }
+        }
+
+        // 삭제버튼을 누를 수 있는지 여부확인
+        public bool CanDelEmployee
+        {
+            get { return Id != 0; }  // TextBox Id 속서의 값이 0이면 false, 0이 아니면 true
+        }
+
+        public void DelEmployee()
+        {
+            if (Id == 0)
+            {
+                MessageBox.Show("삭제불가!");
+                return;
+            }
+
+            if (MessageBox.Show("삭제하시겠습니까?", "삭제여부", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
+            {
+                return; 
+            }
+
+            using (SqlConnection conn = new SqlConnection(Helpers.Common.CONNSTRING))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand(Models.Employees.DELETE_QUERY, conn);
+                SqlParameter prmId = new SqlParameter("@Id", Id);
+                cmd.Parameters.Add(prmId);
+
+                var res = cmd.ExecuteNonQuery();
+                if (res >= 0)
+                {
+                    MessageBox.Show("삭제성공!");
+                }
+                else
+                {
+                    MessageBox.Show("삭제실패!");
+                }
+
+                GetEmployees();
+                NewEmployee(); // 입력값 초기화
+            }
+        }
+
+        public void NewEmployee()
+        {
+            Id = 0;
+            Salary = 0;
+            EmpName = DeptName = Addr = "";
         }
     }
 }
