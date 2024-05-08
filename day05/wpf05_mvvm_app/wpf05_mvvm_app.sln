@@ -5,7 +5,12 @@ VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ex07_EmployeeMngApp", "ex07_EmployeeMngApp\ex07_EmployeeMngApp.csproj", "{32830498-2DEC-4627-B706-76AACF624D00}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ex10_MovieFinder2024", "ex10_MovieFinder2024\ex10_MovieFinder2024.csproj", "{370E7EFF-7095-4B7D-8004-EAE4083F1CBB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ex10_MovieFinder2024", "ex10_MovieFinder2024\ex10_MovieFinder2024.csproj", "{370E7EFF-7095-4B7D-8004-EAE4083F1CBB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DB99E99B-7A05-4B9C-A9B5-1EAC67FF6DEB}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
